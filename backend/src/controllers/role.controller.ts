@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as roleService from "../services/role.service.js";
+import * as roleService from "../services/role.service";
 
 type Params = {
   id: string;
