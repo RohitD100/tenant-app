@@ -14,13 +14,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("accessToken"); // match your storage
         if (!token) throw new Error("No token found");
-        const decoded: { userId: string } = jwtDecode(token);
-        const data = await getUserDetails(decoded.userId);
+
+        // Decode JWT to get userId
+        const decoded: { id: string } = jwtDecode(token);
+
+        // Fetch user details from API
+        const data = await getUserDetails(decoded.id);
         setUser(data);
       } catch (err) {
-        console.log("err :", err);
+        console.log("Error fetching user:", err);
         setUser(null);
       } finally {
         setLoading(false);
@@ -29,7 +33,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     fetchUser();
   }, []);
-
   const logout = () => {
     setUser(null);
   };
