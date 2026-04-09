@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
-import { AuthRequest } from "../types/express.js";
-import User from "../models/User.js";
+import { AuthRequest } from "../types/express";
+import User from "../models/User";
 
 export const authorize = (requiredPermission: string) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {

@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db";
 import roleRoutes from "./routes/role.routes";
 import siteRoutes from "./routes/site.routes";
+import userRoutes from "./routes/user.routes";
 
 const app: Application = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/sites", siteRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/health", (_, res) => {
   res.json({ status: "OK" });
