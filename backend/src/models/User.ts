@@ -7,6 +7,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role?: mongoose.Types.ObjectId;
+  site?: mongoose.Types.ObjectId;
   status: "active" | "inactive";
   comparePassword(password: string): Promise<boolean>;
 }
@@ -34,6 +35,10 @@ const userSchema: Schema<IUser> = new Schema(
     role: {
       type: Schema.Types.ObjectId,
       ref: "Role",
+    },
+    site: {
+      type: Schema.Types.ObjectId,
+      ref: "Site",
     },
     status: {
       type: String,
