@@ -22,8 +22,21 @@ export const updateSite = async (req: Request<IdParams>, res: Response) => {
     return res.status(400).json({ message: "Invalid ID" });
   }
 
-  const site = await siteService.updateSite(req.params.id, req.body);
-  res.json(site);
+  try {
+    const site = await siteService.updateSite(req.params.id, req.body);
+
+    if (!site) {
+      return res.status(404).json({ message: "Site not found" });
+    }
+
+    res.status(200).json({
+      message: "Site updated successfully",
+      site,
+    });
+  } catch (error) {
+    console.error("Error updating site:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const deleteSite = async (req: Request<IdParams>, res: Response) => {

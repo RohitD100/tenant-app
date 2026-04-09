@@ -1,6 +1,10 @@
 import Site from "../models/Site";
 
-export const createSite = async (data: { name: string; location: string }) => {
+export const createSite = async (data: {
+  name: string;
+  location: string;
+  status: string;
+}) => {
   return Site.create(data);
 };
 
