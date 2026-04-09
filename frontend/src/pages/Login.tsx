@@ -21,8 +21,8 @@ function Login() {
 
       sessionStorage.setItem("accessToken", accessToken);
       sessionStorage.setItem("user", JSON.stringify(user));
-
       setError("");
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login failed", err);
       setError("Invalid email or password");

@@ -29,18 +29,33 @@ export default function ButtonAppBar() {
             Welcome!
           </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-            <Button
-              onClick={() => (window.location.href = "/login")}
-              color="inherit"
-            >
-              Sign In
-            </Button>
-            <Button
-              onClick={() => (window.location.href = "/signup")}
-              color="inherit"
-            >
-              Sign Up
-            </Button>
+            {!user && (
+              <Button
+                onClick={() => (window.location.href = "/login")}
+                color="inherit"
+              >
+                Sign In
+              </Button>
+            )}
+            {!user && (
+              <Button
+                onClick={() => (window.location.href = "/signup")}
+                color="inherit"
+              >
+                Sign Up
+              </Button>
+            )}
+            {user && (
+              <Button
+                onClick={() => {
+                  sessionStorage.clear();
+                  window.location.href = "/login";
+                }}
+                color="inherit"
+              >
+                Logout
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
