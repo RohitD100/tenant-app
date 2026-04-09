@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Container,
   Typography,
@@ -24,7 +23,7 @@ import {
   FormControl,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import { createSite, getSites, updateSite } from "../api/site";
+import { createSite, deleteSite, getSites, updateSite } from "../api/site";
 
 interface Site {
   id: string | number | null;
@@ -127,7 +126,7 @@ const SitesManagement = () => {
   const handleDeleteSite = async (id: string | number | null) => {
     if (!id) return;
     try {
-      await axios.delete(`/api/sites/${id}`);
+      await deleteSite(`${id}`);
       setSites(sites.filter((site) => site.id !== id));
     } catch (error) {
       console.error("Failed to delete site:", error);

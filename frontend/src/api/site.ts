@@ -53,3 +53,16 @@ export const updateSite = async (
 
   return res.data;
 };
+
+export const deleteSite = async (siteId: string) => {
+  const token = sessionStorage.getItem("accessToken");
+  if (!token) throw new Error("No token found");
+
+  const res = await API.delete(`/sites/${siteId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
