@@ -15,5 +15,6 @@ router.patch(
   authorize("UPDATE_USER"),
   userController.deactivateUser,
 );
+router.get("/:id", authorize("READ_USER"), userController.getUserById);
 
 export default router;

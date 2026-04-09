@@ -41,3 +41,17 @@ export const deactivateUser = async (req: Request<IdParams>, res: Response) => {
   await userService.deactivateUser(req.params.id);
   res.json({ message: "User deactivated" });
 };
+
+export const getUserById = async (req: Request<IdParams>, res: Response) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    const user = await userService.getUserById(req.params.id);
+
+    res.json(user);
+  } catch (err: any) {
+    res.status(404).json({ message: err.message });
+  }
+};

@@ -55,3 +55,13 @@ export const updateUser = async (id: string, data: any) => {
 export const deactivateUser = async (id: string) => {
   return User.findByIdAndUpdate(id, { status: "inactive" }, { new: true });
 };
+
+export const getUserById = async (id: string) => {
+  const user = await User.findById(id).populate("role").populate("site");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
