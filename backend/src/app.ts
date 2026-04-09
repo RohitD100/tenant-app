@@ -5,7 +5,7 @@ import connectDB from "./config/db";
 import roleRoutes from "./routes/role.routes";
 import siteRoutes from "./routes/site.routes";
 import userRoutes from "./routes/user.routes";
-import dashboardRoutes from "./routes/dashboard.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes";
 
 const app: Application = express();
 
