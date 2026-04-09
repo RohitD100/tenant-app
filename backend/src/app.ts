@@ -5,6 +5,7 @@ import connectDB from "./config/db";
 import roleRoutes from "./routes/role.routes";
 import siteRoutes from "./routes/site.routes";
 import userRoutes from "./routes/user.routes";
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 const app: Application = express();
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/sites", siteRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/health", (_, res) => {
   res.json({ status: "OK" });
