@@ -4,6 +4,7 @@ export interface ISite extends Document {
   name: string;
   location: string;
   status: "active" | "inactive";
+  timezone: string;
 }
 
 const siteSchema = new Schema<ISite>(
@@ -14,6 +15,11 @@ const siteSchema = new Schema<ISite>(
       type: String,
       enum: ["active", "inactive"],
       default: "active",
+    },
+    timezone: {
+      type: String,
+      required: true,
+      default: "UTC",
     },
   },
   { timestamps: true },

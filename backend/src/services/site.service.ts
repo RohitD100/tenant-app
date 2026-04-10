@@ -4,6 +4,7 @@ export const createSite = async (data: {
   name: string;
   location: string;
   status: string;
+  timezone: string;
 }) => {
   return Site.create(data);
 };
@@ -14,7 +15,12 @@ export const getSites = async () => {
 
 export const updateSite = async (
   id: string,
-  data: Partial<{ name: string; location: string; status: string }>,
+  data: Partial<{
+    name: string;
+    location: string;
+    status: string;
+    timezone: string;
+  }>,
 ) => {
   return Site.findByIdAndUpdate(id, data, { new: true });
 };
