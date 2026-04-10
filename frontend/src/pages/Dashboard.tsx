@@ -51,7 +51,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  console.log("error :", error);
   if (error) {
     return (
       <Container sx={{ mt: 4, textAlign: "center" }}>

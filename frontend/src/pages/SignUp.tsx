@@ -1,18 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { TextField, Button, Container, Box, Typography } from "@mui/material";
+import { signup } from "../api/auth";
 
 function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    alert(`Signed up as ${name} with email ${email}`);
+    setIsLoading(true);
+
+    try {
+      const res = await signup({ name, email, password });
+      const accessToken = res.data.token;
+      const user = res.data.user;
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("user", JSON.stringify(user));
+      setError("");
+      window.location.href = "/dashboard";
+    } catch (err) {
+      console.error("Signup failed", err);
+      setError("Failed to sign up");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,8 +80,13 @@ function SignUp() {
             fullWidth
             sx={{ mt: 2 }}
           >
-            Sign Up
+            {isLoading ? "Signing up..." : "Sign Up"}
           </Button>
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
         </Box>
       </Box>
     </Container>

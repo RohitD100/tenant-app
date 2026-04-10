@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IUser } from "../pages/UsersManagement";
 import API from "./axios";
 
@@ -12,7 +13,16 @@ export const createUser = async (data: Partial<IUser> | null) => {
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("No token found");
 
-  const res = await API.post("/users", data, {
+  const updatedData = { ...data, status: "active" };
+  if (updatedData.role) {
+    updatedData.role = updatedData.role._id as any;
+  }
+
+  if (updatedData.site) {
+    updatedData.site = updatedData.site._id as any;
+  }
+
+  const res = await API.post("/users", updatedData, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -32,9 +42,18 @@ export const updateUser = async (data: Partial<IUser>) => {
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("No token found");
 
+  const updatedData = { ...data, status: "active" };
+  if (updatedData.role) {
+    updatedData.role = updatedData.role._id as any;
+  }
+
+  if (updatedData.site) {
+    updatedData.site = updatedData.site._id as any;
+  }
+
   const res = await API.put(
     `/users/${data["_id"]}`,
-    { ...data, status: "active" },
+    { ...updatedData, status: "active" },
     {
       headers: {
         Authorization: `Bearer ${token}`,
