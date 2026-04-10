@@ -1,19 +1,26 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { validateSignup, validateLogin } from "../validators/auth.validator";
+import { LoginInput, SignupInput } from "../types/auth.types";
 
-interface SignupInput {
-  name: string;
-  email: string;
-  password: string;
-}
-
-interface LoginInput {
-  email: string;
-  password: string;
-}
-
-//  SIGNUP
+/**
+ * Creates a new user account and returns an authentication token.
+ *
+ * Steps:
+ * - Validates input data
+ * - Checks if email already exists
+ * - Creates user in database
+ * - Generates JWT token
+ *
+ * @param {SignupInput} param0 - User signup data
+ * @param {string} param0.name - Full name of the user
+ * @param {string} param0.email - Email address of the user
+ * @param {string} param0.password - Plain text password
+ *
+ * @returns {Promise<{token: string, user: any}>} JWT token and created user
+ *
+ * @throws {Error} If validation fails or email already exists
+ */
 export const signup = async ({ name, email, password }: SignupInput) => {
   validateSignup({ name, email, password });
 
@@ -35,7 +42,23 @@ export const signup = async ({ name, email, password }: SignupInput) => {
   return { token, user };
 };
 
-//  LOGIN
+/**
+ * Authenticates a user and returns a JWT token.
+ *
+ * Steps:
+ * - Validates input credentials
+ * - Finds user by email
+ * - Verifies password
+ * - Generates JWT token with role info
+ *
+ * @param {LoginInput} param0 - Login credentials
+ * @param {string} param0.email - User email
+ * @param {string} param0.password - User password
+ *
+ * @returns {Promise<{token: string, user: any}>} JWT token and authenticated user
+ *
+ * @throws {Error} If credentials are invalid
+ */
 export const login = async ({ email, password }: LoginInput) => {
   validateLogin({ email, password });
 
