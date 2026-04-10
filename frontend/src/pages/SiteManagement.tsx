@@ -183,7 +183,7 @@ const SitesManagement = () => {
         </Button>
       )}
 
-      {permissions.includes(PERMISSIONS.READ_SITE) ? (
+      {!permissions.includes(PERMISSIONS.READ_SITE) ? (
         <Typography variant="h6">
           You don't have permission to view sites
         </Typography>
