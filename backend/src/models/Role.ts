@@ -22,7 +22,7 @@ export interface IRole extends Document {
  *
  * @type {Schema<IRole>}
  */
-const roleSchema = new Schema<IRole>(
+export const roleSchema = new Schema<IRole>(
   {
     /** The name of the role (e.g., "Admin", "User") */
     name: { type: String, required: true, unique: true },

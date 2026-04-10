@@ -1,73 +1,83 @@
 import { Router } from "express";
 import * as roleController from "../controllers/role.controller";
 import auth from "../middleware/auth";
+import { authorize } from "../middleware/permission";
+import { PERMISSIONS } from "../constants/permissions";
+import { validate } from "../middleware/validate";
+import {
+  createRoleSchema,
+  updateRoleSchema,
+} from "../validators/role.validator";
 
 /**
  * Role management routes for handling CRUD operations on user roles.
+ *
+ * All routes are protected by authentication and fine-grained permission-based authorization.
  *
  * @module roleRoutes
  */
 
 /**
- * The router that handles all role-related routes, protected by authentication middleware.
+ * Router instance for role-related endpoints.
  *
  * @type {Router}
  */
 const router = Router();
 
 /**
- * Middleware that protects all role routes, ensuring that only authenticated users can access them.
+ * Protect all role routes with authentication middleware.
+ * Ensures only logged-in users can access role management APIs.
  */
-router.use(auth); // Protect all routes
+router.use(auth);
 
 /**
- * Route to create a new role.
- * This route is protected by authentication middleware.
+ * Create a new role.
+ *
+ * Requires permission: `CREATE_ROLE`
  *
  * @route POST /roles
- * @group Roles - Role management routes
- * @param {object} req.body - The data required to create a role (e.g., name, permissions).
- * @returns {object} 201 - The created role.
- * @returns {object} 400 - Error message if role creation fails.
  */
-router.post("/", roleController.createRole);
+router.post(
+  "/",
+  authorize(PERMISSIONS.CREATE_ROLE), // Ensure the user has permission to create a role
+  validate(createRoleSchema), // Validate the request body using the createRoleSchema
+  roleController.createRole, // Call the controller to handle role creation
+);
 
 /**
- * Route to get all roles.
- * This route is protected by authentication middleware.
+ * Get all roles.
+ *
+ * Requires permission: `READ_ROLE`
  *
  * @route GET /roles
- * @group Roles - Role management routes
- * @returns {array} 200 - List of all roles.
- * @returns {object} 401 - Unauthorized access if the user is not authenticated.
  */
-router.get("/", roleController.getRoles);
+router.get("/", authorize(PERMISSIONS.READ_ROLE), roleController.getRoles);
 
 /**
- * Route to update an existing role by ID.
- * This route is protected by authentication middleware.
+ * Update an existing role by ID.
+ *
+ * Requires permission: `UPDATE_ROLE`
  *
  * @route PUT /roles/{id}
- * @group Roles - Role management routes
- * @param {string} id.path.required - The ID of the role to update.
- * @param {object} req.body - The updated role data (e.g., name, permissions).
- * @returns {object} 200 - The updated role.
- * @returns {object} 400 - Error message if role update fails.
- * @returns {object} 404 - Role not found if the provided ID does not exist.
  */
-router.put("/:id", roleController.updateRole);
+router.put(
+  "/:id",
+  authorize(PERMISSIONS.UPDATE_ROLE), // Ensure the user has permission to update a role
+  validate(updateRoleSchema), // Validate the request body using the updateRoleSchema
+  roleController.updateRole, // Call the controller to handle role update
+);
 
 /**
- * Route to delete a role by ID.
- * This route is protected by authentication middleware.
+ * Delete a role by ID.
+ *
+ * Requires permission: `DELETE_ROLE`
  *
  * @route DELETE /roles/{id}
- * @group Roles - Role management routes
- * @param {string} id.path.required - The ID of the role to delete.
- * @returns {object} 200 - Message confirming the role deletion.
- * @returns {object} 400 - Error message if role deletion fails.
- * @returns {object} 404 - Role not found if the provided ID does not exist.
  */
-router.delete("/:id", roleController.deleteRole);
+router.delete(
+  "/:id",
+  authorize(PERMISSIONS.DELETE_ROLE),
+  roleController.deleteRole,
+);
 
 export default router;
