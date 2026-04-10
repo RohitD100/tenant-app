@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import {
   Box,
   Button,
@@ -22,8 +21,9 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { createUser, getUsers } from "../api/users";
+import { getUsers } from "../api/users";
 import { useUser } from "../hooks/useUser";
+import { createUser, deactivateUser, updateUser } from "../api/user";
 
 export interface IUser {
   _id: string;
@@ -96,7 +96,7 @@ export default function UsersManagement() {
   const handleSaveUser = async () => {
     try {
       if (editingUser?._id) {
-        await axios.put(`/api/users/${editingUser._id}`, editingUser);
+        await updateUser(editingUser);
       } else {
         await createUser(editingUser);
       }
@@ -109,7 +109,7 @@ export default function UsersManagement() {
 
   const handleDeactivate = async (id: string) => {
     try {
-      await axios.patch(`/api/users/${id}/deactivate`);
+      await deactivateUser(id);
       fetchUsers();
     } catch (err) {
       console.error("Failed to deactivate user:", err);
@@ -170,7 +170,7 @@ export default function UsersManagement() {
                       <Button
                         size="small"
                         color="error"
-                        onClick={() => handleDeactivate(user._id)}
+                        onClick={() => handleDeactivate(user["_id"])}
                         disabled={user.status === "inactive"}
                       >
                         Deactivate
