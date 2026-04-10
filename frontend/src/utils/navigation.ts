@@ -1,20 +1,22 @@
 /**
- * Handles navigation by updating the browser's location to the specified path.
- * This function is designed to safely perform navigation using `window.location.href`
- * if the `window` object is available.
- * 
+ * Handles navigation by updating the browser's history without triggering a page reload.
+ * Uses the `window.history.pushState()` method for Single Page Application (SPA) navigation.
+ *
  * @param {string} path - The path to navigate to. This should be a valid URL path (e.g., "/dashboard").
- * 
+ *
  * @example
- * // Navigate to the home page
+ * // Navigate to the home page without reloading the page
  * handleNavigation("/");
- * 
- * @returns {void} 
+ *
+ * @returns {void}
  * This function does not return any value. It simply performs the navigation.
  */
 export const handleNavigation = (path: string): void => {
   if (window) {
-    // Ensure `window` is defined before performing navigation
-    window.location.href = path; // Navigate using window.location.href
+    // Update the browser's history using pushState (no page reload)
+    window.history.pushState({}, "", path);
+
+    // Manually trigger a route change event to notify React of the location change
+    window.dispatchEvent(new PopStateEvent("popstate"));
   }
 };

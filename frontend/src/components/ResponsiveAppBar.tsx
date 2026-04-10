@@ -111,10 +111,6 @@ export default function DrawerAppBar(props: Props) {
                   color: "#fff",
                   fontWeight:
                     location.pathname === item.path ? "bold" : "normal",
-                  backgroundColor:
-                    location.pathname === item.path
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "transparent",
                 }}
                 onClick={() => {
                   handleNavigation(item.path); // Call the navigation function
