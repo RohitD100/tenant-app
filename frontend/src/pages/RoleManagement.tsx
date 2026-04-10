@@ -28,25 +28,10 @@ import {
   Alert,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import axios from "axios";
 import { createRole, deleteRole, getRoles, updateRole } from "../api/role";
-import { PERMISSIONS } from "../constants/permissions";
-
-interface Role {
-  id: string | null;
-  name: string;
-  permissions: string[];
-}
-
-// Convert PERMISSIONS object to an array for the dropdown
-const allPermissions = Object.values(PERMISSIONS);
-
-// Helper to make permissions more readable in UI
-const formatPermission = (perm: string) =>
-  perm
-    .replace(/_/g, " ")
-    .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+import type { Role } from "../types/role";
+import { allPermissions, formatPermission } from "../utils/commonUtils";
+import { getErrorMessage } from "../utils/errorUtils";
 
 const RolesManagement = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -58,16 +43,6 @@ const RolesManagement = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-
-  const getErrorMessage = (err: unknown): string => {
-    if (axios.isAxiosError(err)) {
-      return err.response?.data?.message || err.message || "Axios error";
-    } else if (err instanceof Error) {
-      return err.message;
-    } else {
-      return "Unknown error occurred";
-    }
-  };
 
   // Fetch roles from backend
   const fetchRoles = useCallback(async () => {

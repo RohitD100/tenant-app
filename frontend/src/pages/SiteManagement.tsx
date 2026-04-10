@@ -24,22 +24,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { createSite, deleteSite, getSites, updateSite } from "../api/site";
-
-interface Site {
-  id: string | number | null;
-  name: string;
-  location: string;
-  status: "active" | "inactive";
-  timezone?: string;
-}
-
-interface Timezone {
-  countryCode: string;
-  countryName: string;
-  zoneName: string;
-  gmtOffset: string;
-  timestamp: string;
-}
+import type { Site, Timezone } from "../types/site";
 
 const SitesManagement = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -54,13 +39,9 @@ const SitesManagement = () => {
     timezone: "",
   });
 
-  // ---------------------------
-  // FETCH SITES
-  // ---------------------------
   const fetchSites = async () => {
     try {
       const response = await getSites();
-
       const mappedSites = response.map((site: any) => ({
         id: site["_id"],
         name: site.name,
@@ -68,7 +49,6 @@ const SitesManagement = () => {
         status: site.status,
         timezone: site.timezone || "",
       }));
-
       setSites(mappedSites);
     } catch (error) {
       console.error("Failed to fetch sites:", error);
@@ -79,20 +59,15 @@ const SitesManagement = () => {
     fetchSites();
   }, []);
 
-  // ---------------------------
-  // FETCH TIMEZONES (CORRECTED)
-  // ---------------------------
   useEffect(() => {
     const fetchTimeZones = async () => {
       try {
         const response = await fetch(
           `https://api.timezonedb.com/v2.1/list-time-zone?key=${import.meta.env.VITE_TIMEZONE_API_KEY}&format=json`,
         );
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const data = await response.json();
         setTimezones(data.zones);
       } catch (err) {
@@ -107,9 +82,6 @@ const SitesManagement = () => {
     fetchTimeZones();
   }, []);
 
-  // ---------------------------
-  // DIALOG HANDLERS
-  // ---------------------------
   const handleOpenDialog = (
     site: Site = {
       id: null,
@@ -134,9 +106,6 @@ const SitesManagement = () => {
     });
   };
 
-  // ---------------------------
-  // SAVE SITE
-  // ---------------------------
   const handleSaveSite = async () => {
     setLoading(true);
     try {
@@ -188,9 +157,6 @@ const SitesManagement = () => {
     }
   };
 
-  // ---------------------------
-  // DELETE SITE
-  // ---------------------------
   const handleDeleteSite = async (id: string | number | null) => {
     if (!id) return;
 
@@ -202,9 +168,6 @@ const SitesManagement = () => {
     }
   };
 
-  // ---------------------------
-  // UI
-  // ---------------------------
   return (
     <Container sx={{ mt: 8 }}>
       <Typography variant="h4" gutterBottom>
@@ -215,7 +178,6 @@ const SitesManagement = () => {
         Create Site
       </Button>
 
-      {/* TABLE */}
       <TableContainer component={Paper} sx={{ marginTop: 3 }}>
         <Table>
           <TableHead>
@@ -251,7 +213,6 @@ const SitesManagement = () => {
         </Table>
       </TableContainer>
 
-      {/* DIALOG */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>
           {currentSite.id ? "Update Site" : "Create Site"}
@@ -307,7 +268,6 @@ const SitesManagement = () => {
             </Select>
           </FormControl>
 
-          {/* STATUS */}
           <FormControl fullWidth margin="dense">
             <InputLabel>Status</InputLabel>
             <Select

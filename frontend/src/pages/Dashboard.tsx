@@ -7,11 +7,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { getDashboard } from "../api/dashboard";
-
-interface Metric {
-  label: string;
-  value: number;
-}
+import type { Metric } from "../types/dashboard";
 
 const Dashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -45,7 +41,7 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Container sx={{ mt: 8, textAlign: "center" }}>
+      <Container sx={{ mt: 13, textAlign: "center" }}>
         <CircularProgress />
       </Container>
     );
@@ -53,7 +49,7 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <Container sx={{ mt: 4, textAlign: "center" }}>
+      <Container sx={{ mt: 10, textAlign: "center" }}>
         <Typography color="error">{error}</Typography>
       </Container>
     );

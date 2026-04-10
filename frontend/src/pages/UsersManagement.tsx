@@ -24,16 +24,7 @@ import {
 import { getUsers } from "../api/users";
 import { useUser } from "../hooks/useUser";
 import { createUser, deactivateUser, updateUser } from "../api/user";
-
-export interface IUser {
-  _id: string;
-  name: string;
-  email: string;
-  role?: { _id: string; name: string };
-  site?: { _id: string; name: string };
-  status: "active" | "inactive";
-  password?: string;
-}
+import type { IUser } from "../types/user";
 
 export default function UsersManagement() {
   const [users, setUsers] = useState<IUser[]>([]);
