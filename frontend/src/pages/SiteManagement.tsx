@@ -25,6 +25,8 @@ import {
 import { Edit, Delete } from "@mui/icons-material";
 import { createSite, deleteSite, getSites, updateSite } from "../api/site";
 import type { Site, Timezone } from "../types/site";
+import { useUser } from "../hooks/useUser";
+import { PERMISSIONS } from "../constants/permissions";
 
 const SitesManagement = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -38,6 +40,7 @@ const SitesManagement = () => {
     status: "active",
     timezone: "",
   });
+  const { permissions } = useUser();
 
   const fetchSites = async () => {
     try {
@@ -174,44 +177,52 @@ const SitesManagement = () => {
         🌍 Sites Management
       </Typography>
 
-      <Button variant="contained" onClick={() => handleOpenDialog()}>
-        Create Site
-      </Button>
+      {permissions.includes(PERMISSIONS.CREATE_SITE) && (
+        <Button variant="contained" onClick={() => handleOpenDialog()}>
+          Create Site
+        </Button>
+      )}
 
-      <TableContainer component={Paper} sx={{ marginTop: 3 }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Timezone</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {sites.map((site) => (
-              <TableRow key={site.id}>
-                <TableCell>{site.name}</TableCell>
-                <TableCell>{site.location}</TableCell>
-                <TableCell>{site.timezone}</TableCell>
-                <TableCell>{site.status}</TableCell>
-
-                <TableCell>
-                  <IconButton onClick={() => handleOpenDialog(site)}>
-                    <Edit />
-                  </IconButton>
-
-                  <IconButton onClick={() => handleDeleteSite(site.id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
+      {permissions.includes(PERMISSIONS.READ_SITE) ? (
+        <Typography variant="h6">
+          You don't have permission to view sites
+        </Typography>
+      ) : (
+        <TableContainer component={Paper} sx={{ marginTop: 3 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell>Timezone</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+
+            <TableBody>
+              {sites.map((site) => (
+                <TableRow key={site.id}>
+                  <TableCell>{site.name}</TableCell>
+                  <TableCell>{site.location}</TableCell>
+                  <TableCell>{site.timezone}</TableCell>
+                  <TableCell>{site.status}</TableCell>
+
+                  <TableCell>
+                    <IconButton onClick={() => handleOpenDialog(site)}>
+                      <Edit />
+                    </IconButton>
+
+                    <IconButton onClick={() => handleDeleteSite(site.id)}>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>

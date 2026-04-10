@@ -20,11 +20,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import { getUsers } from "../api/users";
 import { useUser } from "../hooks/useUser";
 import { createUser, deactivateUser, updateUser } from "../api/user";
 import type { IUser } from "../types/user";
+import { PERMISSIONS } from "../constants/permissions";
 
 export default function UsersManagement() {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -36,7 +38,7 @@ export default function UsersManagement() {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<Partial<IUser> | null>(null);
-  const { sites, roles } = useUser();
+  const { sites, roles, permissions } = useUser();
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -116,19 +118,25 @@ export default function UsersManagement() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpenDialog()}
-        >
-          Create User
-        </Button>
+        {permissions?.includes(PERMISSIONS.CREATE_USER) && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpenDialog()}
+          >
+            Create User
+          </Button>
+        )}
       </Box>
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", padding: 3 }}>
           <CircularProgress />
         </Box>
+      ) : !permissions.includes(PERMISSIONS.READ_USER) ? (
+        <Typography variant="h6">
+          You don't have permission to view users
+        </Typography>
       ) : (
         <TableContainer component={Paper}>
           <Table>
@@ -152,20 +160,24 @@ export default function UsersManagement() {
                     <TableCell>{user.site?.name || "-"}</TableCell>
                     <TableCell>{user.status}</TableCell>
                     <TableCell>
-                      <Button
-                        size="small"
-                        onClick={() => handleOpenDialog(user)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeactivate(user["_id"])}
-                        disabled={user.status === "inactive"}
-                      >
-                        Deactivate
-                      </Button>
+                      {permissions?.includes(PERMISSIONS.UPDATE_USER) && (
+                        <Button
+                          size="small"
+                          onClick={() => handleOpenDialog(user)}
+                        >
+                          Edit
+                        </Button>
+                      )}
+                      {permissions?.includes(PERMISSIONS.UPDATE_USER) && (
+                        <Button
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeactivate(user["_id"])}
+                          disabled={user.status === "inactive"}
+                        >
+                          Deactivate
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

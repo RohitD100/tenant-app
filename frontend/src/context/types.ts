@@ -100,6 +100,12 @@ export type UserContextType = {
    * the user can be associated with.
    */
   sites: Site[];
+
+  /**
+   * A list of `Permission` objects that represent the available permissions in the system.
+   * This could be used for things like assigning permissions or managing roles.
+   */
+  permissions: string[];
 };
 
 /**

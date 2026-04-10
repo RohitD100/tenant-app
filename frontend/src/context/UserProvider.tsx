@@ -44,6 +44,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   /**
+   * `permissions` holds the list of permissions associated with the user.
+   * It is populated once the permissions data is fetched from the API.
+   */
+  const [permissions, setPermissions] = useState<string[]>([]);
+
+  /**
    * `isLoggedIn` is a derived value indicating if a user is logged in.
    * It is `true` if `user` is not `null` and `false` otherwise.
    */
@@ -67,6 +73,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         // Fetch the user's details from the API using the user ID
         const data = await getUserDetails(decoded.id);
         setUser(data);
+        setPermissions(data.role.permissions || []);
 
         // Fetch roles associated with the user
         const userRoles = await getRoles();
@@ -113,6 +120,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         loading,
         setUser,
         logout,
+        permissions,
       }}
     >
       {children}

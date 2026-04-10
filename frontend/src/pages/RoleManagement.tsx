@@ -32,6 +32,8 @@ import { createRole, deleteRole, getRoles, updateRole } from "../api/role";
 import type { Role } from "../types/role";
 import { allPermissions, formatPermission } from "../utils/commonUtils";
 import { getErrorMessage } from "../utils/errorUtils";
+import { useUser } from "../hooks/useUser";
+import { PERMISSIONS } from "../constants/permissions";
 
 const RolesManagement = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -43,6 +45,7 @@ const RolesManagement = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const { permissions } = useUser();
 
   // Fetch roles from backend
   const fetchRoles = useCallback(async () => {
@@ -122,13 +125,15 @@ const RolesManagement = () => {
       <Typography variant="h4" gutterBottom>
         🛡️ Roles Management
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpenDialog()}
-      >
-        Create Role
-      </Button>
+      {permissions.includes(PERMISSIONS.CREATE_ROLE) && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpenDialog()}
+        >
+          Create Role
+        </Button>
+      )}
 
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -136,42 +141,52 @@ const RolesManagement = () => {
         </Box>
       )}
 
-      <TableContainer component={Paper} sx={{ marginTop: 3 }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Permissions</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {roles.map((role) => (
-              <TableRow key={role.id}>
-                <TableCell>{role.name}</TableCell>
-                <TableCell>
-                  {role.permissions.map((p) => (
-                    <Chip
-                      key={p}
-                      label={formatPermission(p)}
-                      size="small"
-                      sx={{ mr: 0.5, mb: 0.5 }}
-                    />
-                  ))}
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpenDialog(role)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteRole(role.id)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
+      {!permissions.includes(PERMISSIONS.READ_ROLE) ? (
+        <Typography variant="h6">
+          You don't have permission to view roles
+        </Typography>
+      ) : (
+        <TableContainer component={Paper} sx={{ marginTop: 3 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Permissions</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {roles.map((role) => (
+                <TableRow key={role.id}>
+                  <TableCell>{role.name}</TableCell>
+                  <TableCell>
+                    {role.permissions.map((p) => (
+                      <Chip
+                        key={p}
+                        label={formatPermission(p)}
+                        size="small"
+                        sx={{ mr: 0.5, mb: 0.5 }}
+                      />
+                    ))}
+                  </TableCell>
+                  <TableCell>
+                    {permissions.includes(PERMISSIONS.UPDATE_ROLE) && (
+                      <IconButton onClick={() => handleOpenDialog(role)}>
+                        <Edit />
+                      </IconButton>
+                    )}
+                    {permissions.includes(PERMISSIONS.DELETE_ROLE) && (
+                      <IconButton onClick={() => handleDeleteRole(role.id)}>
+                        <Delete />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Dialog
         open={openDialog}
