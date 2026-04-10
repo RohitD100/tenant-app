@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { IUser } from "../pages/UsersManagement";
+import type { IUser } from "../types/user";
 import API from "./axios";
 
 /**
