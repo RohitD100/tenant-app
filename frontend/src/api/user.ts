@@ -18,11 +18,15 @@ export const updateUser = async (data: Partial<IUser>) => {
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("No token found");
 
-  const res = await API.put(`/users/${data["_id"]}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const res = await API.put(
+    `/users/${data["_id"]}`,
+    { ...data, status: "active" },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   return res.data;
 };
