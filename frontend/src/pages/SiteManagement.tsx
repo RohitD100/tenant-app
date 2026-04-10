@@ -30,29 +30,45 @@ interface Site {
   name: string;
   location: string;
   status: "active" | "inactive";
+  timezone?: string;
+}
+
+interface Timezone {
+  countryCode: string;
+  countryName: string;
+  zoneName: string;
+  gmtOffset: string;
+  timestamp: string;
 }
 
 const SitesManagement = () => {
   const [sites, setSites] = useState<Site[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [timezones, setTimezones] = useState<Timezone[]>([]);
+  const [loading, setLoading] = useState(false);
   const [currentSite, setCurrentSite] = useState<Site>({
     id: null,
     name: "",
     location: "",
     status: "active",
+    timezone: "",
   });
-  const [loading, setLoading] = useState(false); // <-- Loading state
 
-  // Fetch all sites from API on mount
+  // ---------------------------
+  // FETCH SITES
+  // ---------------------------
   const fetchSites = async () => {
     try {
       const response = await getSites();
+
       const mappedSites = response.map((site: any) => ({
         id: site["_id"],
         name: site.name,
         location: site.location,
         status: site.status,
+        timezone: site.timezone || "",
       }));
+
       setSites(mappedSites);
     } catch (error) {
       console.error("Failed to fetch sites:", error);
@@ -60,14 +76,48 @@ const SitesManagement = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchSites();
-    };
-    fetchData();
+    fetchSites();
   }, []);
 
+  // ---------------------------
+  // FETCH TIMEZONES (CORRECTED)
+  // ---------------------------
+  useEffect(() => {
+    const fetchTimeZones = async () => {
+      try {
+        const response = await fetch(
+          `https://api.timezonedb.com/v2.1/list-time-zone?key=${import.meta.env.VITE_TIMEZONE_API_KEY}&format=json`,
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setTimezones(data.zones);
+      } catch (err) {
+        console.error("Failed to fetch time zones:", err);
+      } finally {
+        if (typeof setLoading === "function") {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTimeZones();
+  }, []);
+
+  // ---------------------------
+  // DIALOG HANDLERS
+  // ---------------------------
   const handleOpenDialog = (
-    site: Site = { id: null, name: "", location: "", status: "active" },
+    site: Site = {
+      id: null,
+      name: "",
+      location: "",
+      status: "active",
+      timezone: "",
+    },
   ) => {
     setCurrentSite(site);
     setOpenDialog(true);
@@ -75,19 +125,31 @@ const SitesManagement = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setCurrentSite({ id: null, name: "", location: "", status: "active" });
+    setCurrentSite({
+      id: null,
+      name: "",
+      location: "",
+      status: "active",
+      timezone: "",
+    });
   };
 
+  // ---------------------------
+  // SAVE SITE
+  // ---------------------------
   const handleSaveSite = async () => {
-    setLoading(true); // start loading
+    setLoading(true);
     try {
       if (currentSite.id === null) {
         const response = await createSite(
           currentSite.name,
           currentSite.location,
           currentSite.status,
+          currentSite.timezone,
         );
+
         const siteData = response?.data;
+
         if (siteData) {
           setSites([
             ...sites,
@@ -100,7 +162,9 @@ const SitesManagement = () => {
           currentSite.location,
           currentSite.status,
           `${currentSite.id}`,
+          currentSite.timezone,
         );
+
         if (response?.data) {
           setSites(
             sites.map((site) =>
@@ -114,17 +178,22 @@ const SitesManagement = () => {
           );
         }
       }
+
       await fetchSites();
       handleCloseDialog();
     } catch (error) {
       console.error("Failed to save site:", error);
     } finally {
-      setLoading(false); // stop loading
+      setLoading(false);
     }
   };
 
+  // ---------------------------
+  // DELETE SITE
+  // ---------------------------
   const handleDeleteSite = async (id: string | number | null) => {
     if (!id) return;
+
     try {
       await deleteSite(`${id}`);
       setSites(sites.filter((site) => site.id !== id));
@@ -133,39 +202,45 @@ const SitesManagement = () => {
     }
   };
 
+  // ---------------------------
+  // UI
+  // ---------------------------
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
         🌍 Sites Management
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpenDialog()}
-      >
+
+      <Button variant="contained" onClick={() => handleOpenDialog()}>
         Create Site
       </Button>
 
+      {/* TABLE */}
       <TableContainer component={Paper} sx={{ marginTop: 3 }}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Location</TableCell>
+              <TableCell>Timezone</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {sites.map((site) => (
-              <TableRow key={site.name}>
+              <TableRow key={site.id}>
                 <TableCell>{site.name}</TableCell>
                 <TableCell>{site.location}</TableCell>
+                <TableCell>{site.timezone}</TableCell>
                 <TableCell>{site.status}</TableCell>
+
                 <TableCell>
                   <IconButton onClick={() => handleOpenDialog(site)}>
                     <Edit />
                   </IconButton>
+
                   <IconButton onClick={() => handleDeleteSite(site.id)}>
                     <Delete />
                   </IconButton>
@@ -176,32 +251,63 @@ const SitesManagement = () => {
         </Table>
       </TableContainer>
 
+      {/* DIALOG */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>
           {currentSite.id ? "Update Site" : "Create Site"}
         </DialogTitle>
+
         <DialogContent>
           <TextField
-            autoFocus
             margin="dense"
             label="Site Name"
-            type="text"
             fullWidth
             value={currentSite.name}
             onChange={(e) =>
-              setCurrentSite({ ...currentSite, name: e.target.value })
+              setCurrentSite({
+                ...currentSite,
+                name: e.target.value,
+              })
             }
           />
+
           <TextField
             margin="dense"
             label="Location"
-            type="text"
             fullWidth
             value={currentSite.location}
             onChange={(e) =>
-              setCurrentSite({ ...currentSite, location: e.target.value })
+              setCurrentSite({
+                ...currentSite,
+                location: e.target.value,
+              })
             }
           />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Timezone</InputLabel>
+            <Select
+              value={currentSite.timezone}
+              label="Timezone"
+              onChange={(e) =>
+                setCurrentSite({
+                  ...currentSite,
+                  timezone: e.target.value,
+                })
+              }
+            >
+              {timezones &&
+                timezones.map((tz) => (
+                  <MenuItem key={tz.zoneName} value={tz.zoneName}>
+                    {" "}
+                    {/* Use tz.zoneName or any other unique property */}
+                    {tz.zoneName}{" "}
+                    {/* Or any other property you want to display */}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+
+          {/* STATUS */}
           <FormControl fullWidth margin="dense">
             <InputLabel>Status</InputLabel>
             <Select
@@ -219,14 +325,16 @@ const SitesManagement = () => {
             </Select>
           </FormControl>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleCloseDialog} disabled={loading}>
             Cancel
           </Button>
+
           <Button
             variant="contained"
             onClick={handleSaveSite}
-            disabled={loading} // disable while loading
+            disabled={loading}
           >
             {loading ? "Saving..." : currentSite.id ? "Update" : "Create"}
           </Button>

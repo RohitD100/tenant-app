@@ -15,13 +15,14 @@ export const createSite = async (
   name: string,
   location: string,
   status: "active" | "inactive",
+  timezone: string | undefined,
 ) => {
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("No token found");
 
   const res = await API.post(
     `/sites`,
-    { name, location, status },
+    { name, location, status, timezone },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -37,13 +38,14 @@ export const updateSite = async (
   location: string,
   status: "active" | "inactive",
   siteId: string,
+  timezone: string | undefined,
 ) => {
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("No token found");
 
   const res = await API.put(
     `/sites/${siteId}`,
-    { name, location, status },
+    { name, location, status, timezone },
     {
       headers: {
         Authorization: `Bearer ${token}`,
