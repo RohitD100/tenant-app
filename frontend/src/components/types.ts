@@ -12,3 +12,19 @@ export interface Props {
    */
   children?: React.ReactNode;
 }
+
+/**
+ * Interface for the props used in a drawer component.
+ *
+ * This interface defines the expected structure of the props passed to the drawer component,
+ * which includes a function to toggle the drawer's open/closed state.
+ */
+export interface DrawerProps {
+  /**
+   * A function that toggles the drawer's open/closed state.
+   *
+   * This function is typically called when the user interacts with the drawer's control
+   * (e.g., clicking on a close or open button).
+   */
+  handleDrawerToggle: () => void;
+}

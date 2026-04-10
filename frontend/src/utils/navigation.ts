@@ -20,3 +20,20 @@ export const handleNavigation = (path: string): void => {
     window.dispatchEvent(new PopStateEvent("popstate"));
   }
 };
+
+/**
+ * Logs the user out of the application.
+ *
+ * This function clears the session storage, which removes any stored session data,
+ * navigates the user to the home page ("/"), and reloads the page to reset the application state.
+ *
+ * Usage:
+ * ```ts
+ * logout();
+ * ```
+ */
+export const logout = (): void => {
+  sessionStorage.clear(); // Clears all session data from sessionStorage
+  handleNavigation("/"); // Navigates the user to the home page
+  window.location.reload(); // Reloads the current page to reset the application state
+};
