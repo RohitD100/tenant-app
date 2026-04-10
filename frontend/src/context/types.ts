@@ -1,3 +1,5 @@
+import type { Role, Site } from "./UserProvider";
+
 export type User = {
   id: string;
   name: string;
@@ -15,4 +17,6 @@ export type UserContextType = {
   loading: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
+  roles: Role[];
+  sites: Site[];
 };

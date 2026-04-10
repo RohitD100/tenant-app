@@ -23,6 +23,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { createUser, getUsers } from "../api/users";
+import { useUser } from "../hooks/useUser";
 
 export interface IUser {
   _id: string;
@@ -34,9 +35,6 @@ export interface IUser {
   password?: string;
 }
 
-const roles = ["Admin", "Editor", "Viewer"];
-const sites = ["Site A", "Site B", "Site C"];
-
 export default function UsersManagement() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [search, setSearch] = useState("");
@@ -47,6 +45,7 @@ export default function UsersManagement() {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<Partial<IUser> | null>(null);
+  const { sites, roles } = useUser();
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -228,8 +227,8 @@ export default function UsersManagement() {
               }
             >
               {roles.map((r) => (
-                <MenuItem key={r} value={r}>
-                  {r}
+                <MenuItem key={r.name} value={r["_id"]}>
+                  {r.name}
                 </MenuItem>
               ))}
             </Select>
@@ -246,8 +245,8 @@ export default function UsersManagement() {
               }
             >
               {sites.map((s) => (
-                <MenuItem key={s} value={s}>
-                  {s}
+                <MenuItem key={s.name} value={s["_id"]}>
+                  {s.name}
                 </MenuItem>
               ))}
             </Select>
