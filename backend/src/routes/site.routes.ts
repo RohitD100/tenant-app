@@ -2,6 +2,11 @@ import { Router } from "express";
 import * as siteController from "../controllers/site.controller";
 import auth from "../middleware/auth";
 import { authorize } from "../middleware/permission";
+import { validate } from "../middleware/validate";
+import {
+  createSiteSchema,
+  updateSiteSchema,
+} from "../validators/site.validator";
 
 const router = Router();
 
@@ -29,7 +34,12 @@ router.use(auth);
  * @returns {object} 400 - Error message if site creation fails.
  * @returns {object} 403 - Forbidden if the user does not have the "CREATE_SITE" permission.
  */
-router.post("/", authorize("CREATE_SITE"), siteController.createSite);
+router.post(
+  "/",
+  authorize("CREATE_SITE"), // Ensure user has the CREATE_SITE permission
+  validate(createSiteSchema), // Validate the request body with createSiteSchema
+  siteController.createSite, // Handle site creation
+);
 
 /**
  * Route to get all sites.
@@ -42,7 +52,11 @@ router.post("/", authorize("CREATE_SITE"), siteController.createSite);
  * @returns {object} 401 - Unauthorized if the user is not authenticated.
  * @returns {object} 403 - Forbidden if the user does not have the "READ_SITE" permission.
  */
-router.get("/", authorize("READ_SITE"), siteController.getSites);
+router.get(
+  "/",
+  authorize("READ_SITE"), // Ensure user has the READ_SITE permission
+  siteController.getSites, // Handle site fetching
+);
 
 /**
  * Route to update an existing site by ID.
@@ -58,7 +72,12 @@ router.get("/", authorize("READ_SITE"), siteController.getSites);
  * @returns {object} 403 - Forbidden if the user does not have the "UPDATE_SITE" permission.
  * @returns {object} 404 - Site not found if the provided ID does not exist.
  */
-router.put("/:id", authorize("UPDATE_SITE"), siteController.updateSite);
+router.put(
+  "/:id",
+  authorize("UPDATE_SITE"), // Ensure user has the UPDATE_SITE permission
+  validate(updateSiteSchema), // Validate the request body with updateSiteSchema
+  siteController.updateSite, // Handle site update
+);
 
 /**
  * Route to delete a site by ID.
@@ -73,6 +92,10 @@ router.put("/:id", authorize("UPDATE_SITE"), siteController.updateSite);
  * @returns {object} 403 - Forbidden if the user does not have the "DELETE_SITE" permission.
  * @returns {object} 404 - Site not found if the provided ID does not exist.
  */
-router.delete("/:id", authorize("DELETE_SITE"), siteController.deleteSite);
+router.delete(
+  "/:id",
+  authorize("DELETE_SITE"), // Ensure user has the DELETE_SITE permission
+  siteController.deleteSite, // Handle site deletion
+);
 
 export default router;
