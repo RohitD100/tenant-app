@@ -117,7 +117,7 @@ export default function UsersManagement() {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 3, mt: 8 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <TextField
           label="Search by name or email"

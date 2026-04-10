@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Container sx={{ mt: 4, textAlign: "center" }}>
+      <Container sx={{ mt: 8, textAlign: "center" }}>
         <CircularProgress />
       </Container>
     );
@@ -61,7 +61,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container sx={{ mt: 8 }}>
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>

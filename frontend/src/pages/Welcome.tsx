@@ -1,12 +1,20 @@
-import ButtonAppBar from "../components/AppBar";
+import { Box, Typography } from "@mui/material";
 
 export default function Welcome() {
   return (
     <>
-      <ButtonAppBar />
-      <div className="flex h-screen items-center justify-center">
-        <h1 className="text-4xl font-bold">Welcome to the Tenant App!</h1>
-      </div>
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography sx={{ fontWeight: "bold" }} variant="h4">
+          Welcome to the Tenant App!
+        </Typography>
+      </Box>
     </>
   );
 }
