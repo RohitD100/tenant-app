@@ -131,3 +131,16 @@ hr@adalovelacetechnologies.com
 ---
 
 Feel free to modify the setup and configurations based on your specific environment.
+
+
+Upcoming things :
+- Docker + docker-compose
+- GitHub Actions CI/CD
+- Unit + integration tests (80%+ coverage)
+- Swagger/OpenAPI docs
+- Redis caching
+- Refresh token authentication
+- Role hierarchy & audit logs
+- Multi-tenancy at database level
+- AWS deployment (EC2/ECS/Lambda)
+- Architecture diagram
