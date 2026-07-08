@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 /**
- * Connects to the MongoDB database using the URI provided in the environment variable `MONGO_URI`.
+ * Connects to the MongoDB database using the URI provided in the environment variable `MONGODB_URI`.
  * 
  * This function uses `mongoose.connect` to establish a connection to the database. If the connection is successful,
  * a success message is logged. If there is an error, it is logged, and the process exits with a failure status.
@@ -11,10 +11,10 @@ import mongoose from "mongoose";
 const connectDB = async (): Promise<void> => {
   try {
     // Log the Mongo URI (for debugging purposes)
-    console.log(process.env.MONGO_URI as string);
+    console.log(process.env.MONGODB_URI as string);
     
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI as string);
+    await mongoose.connect(process.env.MONGODB_URI as string);
     
     // Log successful connection
     console.log("MongoDB connected");

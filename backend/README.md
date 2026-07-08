@@ -22,7 +22,7 @@ Node.js + Express + TypeScript backend for the Tenant App.
 Create a `.env` file inside the `backend` folder (or copy from `.env.sample`):
 
 ```env
-MONGO_URI=your_mongodb_connection_string
+MONGODB_URI=your_mongodb_connection_string
 PORT=5000
 JWT_SECRET=your_jwt_secret
 ```

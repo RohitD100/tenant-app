@@ -64,7 +64,7 @@ This is a MERN (MongoDB, Express, React, Node.js) based application for managing
 
 3. Create a `.env` file in the root directory and configure the environment variables:
     ```bash
-    MONGO_URI=<your-mongo-atlas-connection-string>
+    MONGODB_URI=<your-mongo-atlas-connection-string>
     JWT_SECRET=<your-jwt-secret-key>
     PORT=5000
     ```
