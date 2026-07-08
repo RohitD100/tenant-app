@@ -49,10 +49,16 @@ export const login = async ({ email, password }: LoginInput) => {
 
   if (cachedUser) {
     user = User.hydrate(JSON.parse(cachedUser));
-    await user.populate("role");
   } else {
     // 2. Fallback to MongoDB
-    user = await User.findOne({ email }).populate("role");
+    const userDoc = await User.findOne({ email });
+    if (!userDoc) {
+      throw new Error("Invalid credentials");
+    }
+    if (typeof userDoc.populate === "function") {
+      await userDoc.populate("role");
+    }
+    user = userDoc;
 
     if (!user) {
       throw new Error("Invalid credentials");
@@ -83,5 +89,8 @@ export const login = async ({ email, password }: LoginInput) => {
     }
   );
 
+  if (user && typeof user.populate === "function") {
+    delete user.populate;
+  }
   return { token, user };
 };

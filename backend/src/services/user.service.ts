@@ -42,9 +42,15 @@ export const createUser = async (data: any) => {
     site,
   });
 
-  const populatedUser = await User.findById(user._id)
-    .populate("role")
-    .populate("site");
+  const userDoc = await User.findById(user._id);
+  if (!userDoc) {
+    throw new Error("User not found after creation");
+  }
+  if (typeof userDoc.populate === "function") {
+    await userDoc.populate("role");
+    await userDoc.populate("site");
+  }
+  const populatedUser = userDoc;
 
   await Promise.all([
     redisClient.setEx(
@@ -97,11 +103,19 @@ export const getUsers = async ({
  * Updates a user by ID.
  */
 export const updateUser = async (id: string, data: any) => {
-  const updatedUser = await User.findByIdAndUpdate(id, data, {
+  const updatedDoc = await User.findByIdAndUpdate(id, data, {
     new: true,
-  })
-    .populate("role")
-    .populate("site");
+  });
+  if (!updatedDoc) {
+    throw new Error("User not found for update");
+  }
+  let updatedUser = updatedDoc;
+  if (typeof updatedDoc.populate === "function") {
+    updatedUser = await updatedDoc.populate("role");
+    if (typeof updatedUser.populate === "function") {
+      await updatedUser.populate("site");
+    }
+  }
 
   if (updatedUser) {
     await redisClient.setEx(
@@ -118,13 +132,21 @@ export const updateUser = async (id: string, data: any) => {
  * Deactivates a user (soft disable).
  */
 export const deactivateUser = async (id: string) => {
-  const user = await User.findByIdAndUpdate(
+  const userDoc = await User.findByIdAndUpdate(
     id,
     { status: "inactive" },
     { new: true }
-  )
-    .populate("role")
-    .populate("site");
+  );
+  if (!userDoc) {
+    throw new Error("User not found for deactivation");
+  }
+  let user = userDoc;
+  if (typeof userDoc.populate === "function") {
+    user = await userDoc.populate("role");
+    if (typeof user.populate === "function") {
+      await user.populate("site");
+    }
+  }
 
   if (user) {
     await Promise.all([
@@ -150,9 +172,17 @@ export const getUserById = async (id: string) => {
     return JSON.parse(cachedUser);
   }
 
-  const user = await User.findById(id)
-    .populate("role")
-    .populate("site");
+  const userDoc = await User.findById(id);
+  if (!userDoc) {
+    throw new Error("User not found");
+  }
+  let user = userDoc;
+  if (typeof userDoc.populate === "function") {
+    user = await userDoc.populate("role");
+    if (typeof user.populate === "function") {
+      await user.populate("site");
+    }
+  }
 
   if (!user) {
     throw new Error("User not found");

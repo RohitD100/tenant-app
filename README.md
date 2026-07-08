@@ -135,8 +135,9 @@ Feel free to modify the setup and configurations based on your specific environm
 
 Upcoming things :
 - Unit + integration tests (80%+ coverage)
-- Redis caching
+- update readme.md file
+
 - Refresh token authentication
-- Role hierarchy & audit logs
+- audit logs
 - Multi-tenancy at database level
 - AWS deployment (EC2/ECS/Lambda)
