@@ -2,29 +2,16 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { validateSignup, validateLogin } from "../validators/auth.validator";
 import { LoginInput, SignupInput } from "../types/auth.types";
+import redisClient from "../config/redis";
 
-/**
- * Creates a new user account and returns an authentication token.
- *
- * Steps:
- * - Validates input data
- * - Checks if email already exists
- * - Creates user in database
- * - Generates JWT token
- *
- * @param {SignupInput} param0 - User signup data
- * @param {string} param0.name - Full name of the user
- * @param {string} param0.email - Email address of the user
- * @param {string} param0.password - Plain text password
- *
- * @returns {Promise<{token: string, user: any}>} JWT token and created user
- *
- * @throws {Error} If validation fails or email already exists
- */
+const USER_CACHE_PREFIX = "user:";
+const USER_CACHE_TTL = 60 * 60; 
+
 export const signup = async ({ name, email, password }: SignupInput) => {
   validateSignup({ name, email, password });
 
   const existingUser = await User.findOne({ email });
+
   if (existingUser) {
     throw new Error("Email already registered");
   }
@@ -35,37 +22,48 @@ export const signup = async ({ name, email, password }: SignupInput) => {
     password,
   });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-    expiresIn: "1d",
-  });
+  await redisClient.setEx(
+    `${USER_CACHE_PREFIX}${email}`,
+    USER_CACHE_TTL,
+    JSON.stringify(user)
+  );
+
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "1d",
+    }
+  );
 
   return { token, user };
 };
 
-/**
- * Authenticates a user and returns a JWT token.
- *
- * Steps:
- * - Validates input credentials
- * - Finds user by email
- * - Verifies password
- * - Generates JWT token with role info
- *
- * @param {LoginInput} param0 - Login credentials
- * @param {string} param0.email - User email
- * @param {string} param0.password - User password
- *
- * @returns {Promise<{token: string, user: any}>} JWT token and authenticated user
- *
- * @throws {Error} If credentials are invalid
- */
 export const login = async ({ email, password }: LoginInput) => {
   validateLogin({ email, password });
 
-  const user = await User.findOne({ email }).populate("role");
+  let user: any;
 
-  if (!user) {
-    throw new Error("Invalid credentials");
+  // 1. Try Redis first
+  const cachedUser = await redisClient.get(`${USER_CACHE_PREFIX}${email}`);
+
+  if (cachedUser) {
+    user = User.hydrate(JSON.parse(cachedUser));
+    await user.populate("role");
+  } else {
+    // 2. Fallback to MongoDB
+    user = await User.findOne({ email }).populate("role");
+
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    // 3. Cache the user
+    await redisClient.setEx(
+      `${USER_CACHE_PREFIX}${email}`,
+      USER_CACHE_TTL,
+      JSON.stringify(user)
+    );
   }
 
   const isMatch = await user.comparePassword(password);
@@ -75,9 +73,14 @@ export const login = async ({ email, password }: LoginInput) => {
   }
 
   const token = jwt.sign(
-    { id: user._id, role: (user.role as any)?.name },
+    {
+      id: user._id,
+      role: (user.role as any)?.name,
+    },
     process.env.JWT_SECRET as string,
-    { expiresIn: "1d" },
+    {
+      expiresIn: "1d",
+    }
   );
 
   return { token, user };

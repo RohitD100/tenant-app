@@ -1,4 +1,9 @@
+import redisClient from "../config/redis";
 import Site from "../models/Site";
+
+const SITES_CACHE_KEY = "sites:all";
+const DASHBOARD_STATS_KEY = "dashboard:stats";
+const SITES_CACHE_TTL = 60 * 60; // 1 hour
 
 /**
  * Creates a new site in the system.
@@ -17,16 +22,40 @@ export const createSite = async (data: {
   status: string;
   timezone: string;
 }) => {
-  return Site.create(data);
+  const site = await Site.create(data);
+
+  // Invalidate caches
+  await Promise.all([
+    redisClient.del(SITES_CACHE_KEY),
+    redisClient.del(DASHBOARD_STATS_KEY),
+  ]);
+
+  return site;
 };
 
 /**
  * Retrieves all sites from the database.
  *
+ * Results are cached in Redis.
+ *
  * @returns {Promise<any[]>} List of sites
  */
 export const getSites = async () => {
-  return Site.find();
+  const cachedSites = await redisClient.get(SITES_CACHE_KEY);
+
+  if (cachedSites) {
+    return JSON.parse(cachedSites);
+  }
+
+  const sites = await Site.find();
+
+  await redisClient.setEx(
+    SITES_CACHE_KEY,
+    SITES_CACHE_TTL,
+    JSON.stringify(sites)
+  );
+
+  return sites;
 };
 
 /**
@@ -36,10 +65,6 @@ export const getSites = async () => {
  *
  * @param {string} id - Site ID
  * @param {Object} data - Update data
- * @param {string} [data.name] - Updated site name (optional)
- * @param {string} [data.location] - Updated location (optional)
- * @param {string} [data.status] - Updated status (optional)
- * @param {string} [data.timezone] - Updated timezone (optional)
  *
  * @returns {Promise<any | null>} Updated site document or null if not found
  */
@@ -50,9 +75,19 @@ export const updateSite = async (
     location: string;
     status: string;
     timezone: string;
-  }>,
+  }>
 ) => {
-  return Site.findByIdAndUpdate(id, data, { new: true });
+  const updatedSite = await Site.findByIdAndUpdate(id, data, {
+    new: true,
+  });
+
+  // Invalidate caches
+  await Promise.all([
+    redisClient.del(SITES_CACHE_KEY),
+    redisClient.del(DASHBOARD_STATS_KEY),
+  ]);
+
+  return updatedSite;
 };
 
 /**
@@ -63,5 +98,13 @@ export const updateSite = async (
  * @returns {Promise<any>} Deleted site document
  */
 export const deleteSite = async (id: string) => {
-  return Site.findByIdAndDelete(id);
+  const deletedSite = await Site.findByIdAndDelete(id);
+
+  // Invalidate caches
+  await Promise.all([
+    redisClient.del(SITES_CACHE_KEY),
+    redisClient.del(DASHBOARD_STATS_KEY),
+  ]);
+
+  return deletedSite;
 };
