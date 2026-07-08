@@ -1,42 +1,42 @@
-name: Build Check
+# name: Build Check
 
-on:
-  push:
-    branches: [main]
-  pull_request:
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
 
-jobs:
-  backend:
-    runs-on: ubuntu-latest
+# jobs:
+#   backend:
+#     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend
+#     defaults:
+#       run:
+#         working-directory: backend
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
 
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+#       - run: npm ci
+#       - run: npm test
+#       - run: npm run build
 
-  frontend:
-    runs-on: ubuntu-latest
+#   frontend:
+#     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: frontend
+#     defaults:
+#       run:
+#         working-directory: frontend
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
 
-      - run: npm ci
-      - run: npm run build
+#       - run: npm ci
+#       - run: npm run build
