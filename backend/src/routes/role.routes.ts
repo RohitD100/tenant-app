@@ -9,70 +9,176 @@ import {
   updateRoleSchema,
 } from "../validators/role.validator";
 
-/**
- * Role management routes for handling CRUD operations on user roles.
- *
- * All routes are protected by authentication and fine-grained permission-based authorization.
- *
- * @module roleRoutes
- */
-
-/**
- * Router instance for role-related endpoints.
- *
- * @type {Router}
- */
 const router = Router();
 
 /**
- * Protect all role routes with authentication middleware.
- * Ensures only logged-in users can access role management APIs.
+ * @swagger
+ * tags:
+ *   name: Roles
+ *   description: Role management APIs
  */
+
 router.use(auth);
 
 /**
- * Create a new role.
- *
- * Requires permission: `CREATE_ROLE`
- *
- * @route POST /roles
+ * @swagger
+ * /roles:
+ *   post:
+ *     summary: Create a new role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - permissions
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Manager
+ *               permissions:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example:
+ *                   - CREATE_USER
+ *                   - READ_USER
+ *                   - UPDATE_USER
+ *     responses:
+ *       201:
+ *         description: Role created successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks CREATE_ROLE permission.
  */
 router.post(
   "/",
-  authorize(PERMISSIONS.CREATE_ROLE), // Ensure the user has permission to create a role
-  validate(createRoleSchema), // Validate the request body using the createRoleSchema
-  roleController.createRole, // Call the controller to handle role creation
+  authorize(PERMISSIONS.CREATE_ROLE),
+  validate(createRoleSchema),
+  roleController.createRole,
 );
 
 /**
- * Get all roles.
- *
- * Requires permission: `READ_ROLE`
- *
- * @route GET /roles
+ * @swagger
+ * /roles:
+ *   get:
+ *     summary: Get all roles
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of roles.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: Admin
+ *                   permissions:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks READ_ROLE permission.
  */
 router.get("/", authorize(PERMISSIONS.READ_ROLE), roleController.getRoles);
 
 /**
- * Update an existing role by ID.
- *
- * Requires permission: `UPDATE_ROLE`
- *
- * @route PUT /roles/{id}
+ * @swagger
+ * /roles/{id}:
+ *   put:
+ *     summary: Update an existing role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Role ID
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Super Admin
+ *               permissions:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example:
+ *                   - CREATE_USER
+ *                   - DELETE_USER
+ *                   - UPDATE_ROLE
+ *     responses:
+ *       200:
+ *         description: Role updated successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks UPDATE_ROLE permission.
+ *       404:
+ *         description: Role not found.
  */
 router.put(
   "/:id",
-  authorize(PERMISSIONS.UPDATE_ROLE), // Ensure the user has permission to update a role
-  validate(updateRoleSchema), // Validate the request body using the updateRoleSchema
-  roleController.updateRole, // Call the controller to handle role update
+  authorize(PERMISSIONS.UPDATE_ROLE),
+  validate(updateRoleSchema),
+  roleController.updateRole,
 );
 
 /**
- * Delete a role by ID.
- *
- * Requires permission: `DELETE_ROLE`
- *
- * @route DELETE /roles/{id}
+ * @swagger
+ * /roles/{id}:
+ *   delete:
+ *     summary: Delete a role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Role ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Role deleted successfully.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks DELETE_ROLE permission.
+ *       404:
+ *         description: Role not found.
  */
 router.delete(
   "/:id",

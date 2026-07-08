@@ -1,40 +1,116 @@
 import { Router } from "express";
 import { login, signup } from "../controllers/auth.controller";
 
-/**
- * Auth routes that handle user authentication actions such as signing up and logging in.
- * 
- * @module authRoutes
- */
-
-/**
- * The router that handles all authentication-related routes.
- * 
- * @type {Router}
- */
 const router = Router();
 
 /**
- * Route to handle user signup.
- * This route calls the `signup` controller to create a new user in the system.
- * 
- * @route POST /signup
- * @group Auth - User authentication routes
- * @param {object} req.body - The signup data (name, email, password)
- * @returns {object} 201 - Created user data
- * @returns {object} 400 - Error message if validation fails
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: User authentication APIs
+ */
+
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Password@123
+ *     responses:
+ *       201:
+ *         description: User registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User created successfully
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Validation error or user already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Email already exists
  */
 router.post("/signup", signup);
 
 /**
- * Route to handle user login.
- * This route calls the `login` controller to authenticate an existing user.
- * 
- * @route POST /login
- * @group Auth - User authentication routes
- * @param {object} req.body - The login data (email, password)
- * @returns {object} 200 - Authenticated user data (including token)
- * @returns {object} 400 - Error message if login fails
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login an existing user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Password@123
+ *     responses:
+ *       200:
+ *         description: Login successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Invalid email or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid credentials
  */
 router.post("/login", login);
 

@@ -11,91 +11,192 @@ import {
 const router = Router();
 
 /**
- * Site management routes for handling CRUD operations on sites.
- * These routes are protected by authentication and authorization middleware.
- *
- * @module siteRoutes
+ * @swagger
+ * tags:
+ *   name: Sites
+ *   description: Site management APIs
  */
 
-/**
- * Middleware that protects all site-related routes, ensuring that only authenticated users can access them.
- */
 router.use(auth);
 
 /**
- * Route to create a new site.
- * This route is protected by both authentication and authorization middleware.
- * Only users with the "CREATE_SITE" permission can access this route.
- *
- * @route POST /sites
- * @group Sites - Site management routes
- * @param {object} req.body - The data required to create a site (e.g., name, location, status, timezone).
- * @returns {object} 201 - The created site.
- * @returns {object} 400 - Error message if site creation fails.
- * @returns {object} 403 - Forbidden if the user does not have the "CREATE_SITE" permission.
+ * @swagger
+ * /sites:
+ *   post:
+ *     summary: Create a new site
+ *     tags: [Sites]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - location
+ *               - timezone
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Head Office
+ *               location:
+ *                 type: string
+ *                 example: New York, USA
+ *               timezone:
+ *                 type: string
+ *                 example: America/New_York
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - ACTIVE
+ *                   - INACTIVE
+ *                 example: ACTIVE
+ *     responses:
+ *       201:
+ *         description: Site created successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks CREATE_SITE permission.
  */
 router.post(
   "/",
-  authorize("CREATE_SITE"), // Ensure user has the CREATE_SITE permission
-  validate(createSiteSchema), // Validate the request body with createSiteSchema
-  siteController.createSite, // Handle site creation
+  authorize("CREATE_SITE"),
+  validate(createSiteSchema),
+  siteController.createSite,
 );
 
 /**
- * Route to get all sites.
- * This route is protected by both authentication and authorization middleware.
- * Only users with the "READ_SITE" permission can access this route.
- *
- * @route GET /sites
- * @group Sites - Site management routes
- * @returns {array} 200 - List of all sites.
- * @returns {object} 401 - Unauthorized if the user is not authenticated.
- * @returns {object} 403 - Forbidden if the user does not have the "READ_SITE" permission.
+ * @swagger
+ * /sites:
+ *   get:
+ *     summary: Get all sites
+ *     tags: [Sites]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of sites.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: Head Office
+ *                   location:
+ *                     type: string
+ *                     example: New York, USA
+ *                   timezone:
+ *                     type: string
+ *                     example: America/New_York
+ *                   status:
+ *                     type: string
+ *                     example: ACTIVE
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks READ_SITE permission.
  */
-router.get(
-  "/",
-  authorize("READ_SITE"), // Ensure user has the READ_SITE permission
-  siteController.getSites, // Handle site fetching
-);
+router.get("/", authorize("READ_SITE"), siteController.getSites);
 
 /**
- * Route to update an existing site by ID.
- * This route is protected by both authentication and authorization middleware.
- * Only users with the "UPDATE_SITE" permission can access this route.
- *
- * @route PUT /sites/{id}
- * @group Sites - Site management routes
- * @param {string} id.path.required - The ID of the site to update.
- * @param {object} req.body - The updated site data (e.g., name, location, status, timezone).
- * @returns {object} 200 - The updated site.
- * @returns {object} 400 - Error message if site update fails.
- * @returns {object} 403 - Forbidden if the user does not have the "UPDATE_SITE" permission.
- * @returns {object} 404 - Site not found if the provided ID does not exist.
+ * @swagger
+ * /sites/{id}:
+ *   put:
+ *     summary: Update an existing site
+ *     tags: [Sites]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Branch Office
+ *               location:
+ *                 type: string
+ *                 example: Chicago, USA
+ *               timezone:
+ *                 type: string
+ *                 example: America/Chicago
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - ACTIVE
+ *                   - INACTIVE
+ *                 example: ACTIVE
+ *     responses:
+ *       200:
+ *         description: Site updated successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks UPDATE_SITE permission.
+ *       404:
+ *         description: Site not found.
  */
 router.put(
   "/:id",
-  authorize("UPDATE_SITE"), // Ensure user has the UPDATE_SITE permission
-  validate(updateSiteSchema), // Validate the request body with updateSiteSchema
-  siteController.updateSite, // Handle site update
+  authorize("UPDATE_SITE"),
+  validate(updateSiteSchema),
+  siteController.updateSite,
 );
 
 /**
- * Route to delete a site by ID.
- * This route is protected by both authentication and authorization middleware.
- * Only users with the "DELETE_SITE" permission can access this route.
- *
- * @route DELETE /sites/{id}
- * @group Sites - Site management routes
- * @param {string} id.path.required - The ID of the site to delete.
- * @returns {object} 200 - Message confirming the site deletion.
- * @returns {object} 400 - Error message if site deletion fails.
- * @returns {object} 403 - Forbidden if the user does not have the "DELETE_SITE" permission.
- * @returns {object} 404 - Site not found if the provided ID does not exist.
+ * @swagger
+ * /sites/{id}:
+ *   delete:
+ *     summary: Delete a site
+ *     tags: [Sites]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Site deleted successfully.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks DELETE_SITE permission.
+ *       404:
+ *         description: Site not found.
  */
 router.delete(
   "/:id",
-  authorize("DELETE_SITE"), // Ensure user has the DELETE_SITE permission
-  siteController.deleteSite, // Handle site deletion
+  authorize("DELETE_SITE"),
+  siteController.deleteSite,
 );
 
 export default router;

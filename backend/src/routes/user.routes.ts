@@ -11,77 +11,253 @@ import {
 const router = Router();
 
 /**
- * User management routes for handling CRUD operations on users.
- * These routes are protected by authentication and permission-based authorization.
- *
- * @module userRoutes
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management APIs
  */
 
-/**
- * Middleware that protects all user routes, ensuring only authenticated users can access them.
- */
 router.use(auth);
 
 /**
- * Route to create a new user.
- * Requires "CREATE_USER" permission.
- *
- * @route POST /users
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - roleId
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Password@123
+ *               roleId:
+ *                 type: integer
+ *                 example: 2
+ *               siteId:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: User created successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks CREATE_USER permission.
  */
 router.post(
   "/",
-  authorize("CREATE_USER"), // Ensure user has the CREATE_USER permission
-  validate(createUserSchema), // Validate the request body with createUserSchema
-  userController.createUser, // Handle user creation
+  authorize("CREATE_USER"),
+  validate(createUserSchema),
+  userController.createUser,
 );
 
 /**
- * Route to retrieve a list of users with optional pagination and search.
- * Requires "READ_USER" permission.
- *
- * @route GET /users
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of records per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search users by name or email
+ *     responses:
+ *       200:
+ *         description: List of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: John Doe
+ *                   email:
+ *                     type: string
+ *                     example: john@example.com
+ *                   role:
+ *                     type: string
+ *                     example: Admin
+ *                   site:
+ *                     type: string
+ *                     example: Head Office
+ *                   isActive:
+ *                     type: boolean
+ *                     example: true
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks READ_USER permission.
  */
 router.get(
   "/",
-  authorize("READ_USER"), // Ensure user has the READ_USER permission
-  userController.getUsers, // Handle retrieving users
+  authorize("READ_USER"),
+  userController.getUsers,
 );
 
 /**
- * Route to update a user by ID.
- * Requires "UPDATE_USER" permission.
- *
- * @route PUT /users/:id
- */
-router.put(
-  "/:id",
-  authorize("UPDATE_USER"), // Ensure user has the UPDATE_USER permission
-  validate(updateUserSchema), // Validate the request body with updateUserSchema
-  userController.updateUser, // Handle user update
-);
-
-/**
- * Route to deactivate a user account by ID.
- * Requires "UPDATE_USER" permission.
- *
- * @route PATCH /users/:id/deactivate
- */
-router.patch(
-  "/:id/deactivate",
-  authorize("UPDATE_USER"), // Ensure user has the UPDATE_USER permission
-  userController.deactivateUser, // Handle deactivating the user
-);
-
-/**
- * Route to get a single user by ID.
- * Requires "READ_USER" permission.
- *
- * @route GET /users/:id
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: User details retrieved successfully.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks READ_USER permission.
+ *       404:
+ *         description: User not found.
  */
 router.get(
   "/:id",
-  authorize("READ_USER"), // Ensure user has the READ_USER permission
-  userController.getUserById, // Handle fetching a user by ID
+  authorize("READ_USER"),
+  userController.getUserById,
+);
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   put:
+ *     summary: Update a user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               roleId:
+ *                 type: integer
+ *                 example: 2
+ *               siteId:
+ *                 type: integer
+ *                 example: 1
+ *               isActive:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: User updated successfully.
+ *       400:
+ *         description: Validation error.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks UPDATE_USER permission.
+ *       404:
+ *         description: User not found.
+ */
+router.put(
+  "/:id",
+  authorize("UPDATE_USER"),
+  validate(updateUserSchema),
+  userController.updateUser,
+);
+
+/**
+ * @swagger
+ * /users/{id}/deactivate:
+ *   patch:
+ *     summary: Deactivate a user account
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: User deactivated successfully.
+ *       401:
+ *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. User lacks UPDATE_USER permission.
+ *       404:
+ *         description: User not found.
+ */
+router.patch(
+  "/:id/deactivate",
+  authorize("UPDATE_USER"),
+  userController.deactivateUser,
 );
 
 export default router;
