@@ -20,6 +20,6 @@ jobs:
         uses: RohitD100/CodeWatch@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          llm_provider: nvidia
+          llm_provider: "nvidia"
           nvidia_api_key: ${{ secrets.NVIDIA_API_KEY }}
-          nvidia_model: openai/gpt-oss-120b
+          nvidia_model: "openai/gpt-oss-120b"
