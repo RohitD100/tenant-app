@@ -171,12 +171,12 @@ const RolesManagement = () => {
                   </TableCell>
                   <TableCell>
                     {permissions.includes(PERMISSIONS.UPDATE_ROLE) && (
-                      <IconButton onClick={() => handleOpenDialog(role)}>
+                      <IconButton disabled={role.name === "Admin"} onClick={() => handleOpenDialog(role)}>
                         <Edit />
                       </IconButton>
                     )}
                     {permissions.includes(PERMISSIONS.DELETE_ROLE) && (
-                      <IconButton onClick={() => handleDeleteRole(role.id)}>
+                      <IconButton disabled={role.name === "Admin"} onClick={() => handleDeleteRole(role.id)}>
                         <Delete />
                       </IconButton>
                     )}

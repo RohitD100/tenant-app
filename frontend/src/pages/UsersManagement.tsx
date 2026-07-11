@@ -162,6 +162,7 @@ export default function UsersManagement() {
                     <TableCell>
                       {permissions?.includes(PERMISSIONS.UPDATE_USER) && (
                         <Button
+                          disabled={user.email === "adminuser123@gmail.com"}
                           size="small"
                           onClick={() => handleOpenDialog(user)}
                         >
@@ -171,9 +172,9 @@ export default function UsersManagement() {
                       {permissions?.includes(PERMISSIONS.UPDATE_USER) && (
                         <Button
                           size="small"
+                          disabled={user.email === "adminuser123@gmail.com" || user.status === "inactive" }
                           color="error"
                           onClick={() => handleDeactivate(user["_id"])}
-                          disabled={user.status === "inactive"}
                         >
                           Deactivate
                         </Button>
