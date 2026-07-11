@@ -33,6 +33,7 @@ A production‑ready web app that enables administrators to manage users, roles,
 ### Prerequisites
 - Node.js (v14+)
 - MongoDB Atlas account (or local MongoDB instance)
+- Redis server (or Docker)
 - Git
 
 ### Setup Steps
@@ -65,13 +66,14 @@ The app will be available at `http://localhost:3000`.
 - Built a **dashboard** showing key metrics, improving admin visibility.
 - Achieved **80%+ test coverage** with unit and integration tests.
 - Set up **CI/CD pipelines** (GitHub Actions) for automated linting, testing, and deployment.
+- Implemented Redis caching layer with comprehensive unit tests.
 - Deployed scalable services to **Render** (backend) and **Vercel** (frontend).
 
 ---
 
 ## Repository & Live Demo
-- **GitHub**: [<Repo URL>](<Repo-URL>)
-- **Live Demo**: [<App URL>](<App-URL>)
+- **Live Demo**: [https://tenant-app-fawn.vercel.app/](https://tenant-app-fawn.vercel.app/)
+- **Admin credentials**: email `adminuser123@gmail.com`, password `Admin@123`
 
 ---
 
